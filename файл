@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia Economy | Донат</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#0a0a0a,#1a1a2e);color:#fff;min-height:100vh}
+        .container{max-width:1200px;margin:0 auto;padding:20px}
+        .header{text-align:center;padding:20px 0;border-bottom:1px solid rgba(255,215,0,.3);margin-bottom:30px}
+        .header h1{font-size:2rem;background:linear-gradient(135deg,#ffd700,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .ip-box{background:rgba(0,0,0,.6);padding:10px 20px;border-radius:50px;display:inline-flex;gap:15px;margin-top:15px;flex-wrap:wrap;justify-content:center}
+        .ip-box code{background:#2a2a3a;padding:5px 15px;border-radius:30px;color:#ffd700}
+        .copy-btn{background:#ffd700;border:none;padding:5px 15px;border-radius:30px;cursor:pointer}
+        .balance-card{background:rgba(42,42,58,.9);border-radius:20px;padding:20px;margin-bottom:30px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:15px;border:1px solid rgba(255,215,0,.3)}
+        .balance-amount{font-size:2rem;font-weight:bold;margin:10px 0}
+        .balance-amount span{background:linear-gradient(135deg,#ffd700,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .nick-input{display:flex;gap:10px}
+        .nick-input input{padding:10px 15px;border-radius:30px;border:none;background:#2a2a3a;color:#fff}
+        .load-btn{background:#ffd700;border:none;padding:10px 20px;border-radius:30px;cursor:pointer}
+        .categories{display:flex;justify-content:center;gap:15px;margin-bottom:30px;flex-wrap:wrap}
+        .cat-btn{background:rgba(0,0,0,.5);border:2px solid rgba(255,215,0,.3);padding:10px 25px;border-radius:50px;cursor:pointer;transition:.3s}
+        .cat-btn.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a1a2e;border-color:transparent}
+        .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+        .card{background:rgba(0,0,0,.7);border-radius:20px;padding:20px;text-align:center;transition:.3s;border:1px solid rgba(255,215,0,.2)}
+        .card:hover{transform:translateY(-5px);border-color:#ffd700}
+        .card h3{font-size:1.3rem;margin:10px 0}
+        .price{font-size:1.5rem;color:#ffd700;margin:10px 0}
+        .stars{font-size:0.9rem;color:#aaa}
+        .features{list-style:none;margin:15px 0;text-align:left}
+        .features li{padding:5px 0;display:flex;align-items:center;gap:8px}
+        .features li i{color:#4caf50}
+        .buy-btn{background:#0088cc;border:none;padding:10px;border-radius:30px;color:#fff;cursor:pointer;width:100%;font-weight:bold;transition:.3s}
+        .buy-btn:hover{background:#26a5e4}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);justify-content:center;align-items:center;z-index:1000}
+        .modal-content{background:#1a1a2a;border-radius:20px;padding:25px;max-width:400px;width:90%;text-align:center;border:1px solid #ffd700}
+        .close{float:right;font-size:28px;cursor:pointer}
+        .telegram-btn{background:#26a5e4;border:none;padding:12px;border-radius:50px;color:#fff;font-size:1.1rem;cursor:pointer;width:100%;margin-top:15px}
+        .notification{position:fixed;bottom:20px;right:20px;background:#4caf50;padding:12px 20px;border-radius:10px;transform:translateX(400px);transition:.3s;z-index:1000}
+        .notification.show{transform:translateX(0)}
+        footer{margin-top:40px;text-align:center;padding:20px;border-top:1px solid rgba(255,215,0,.2);color:#888}
+        max-width:600px{.balance-card{flex-direction:column;text-align:center}.nick-input{justify-content:center}}
+        .hidden{display:none}
+    </style>
+</head>
+<body>
+<div class="container">
+
+
+<div class="header">
+        <h1>⚔️ MAFIA ECONOMY ⚔️</h1>
+        <div class="ip-box">
+            <span>🌐 IP:</span>
+            <code id="server-ip">mafia.aternos.me</code>
+            <button class="copy-btn" onclick="copyIP()">📋 Копировать</button>
+            <span>👥 <span id="online">0</span> онлайн</span>
+        </div>
+    </div>
+
+    <div class="balance-card">
+        <div>
+            <h3>💰 Твой баланс</h3>
+            <div class="balance-amount"><span id="coins">0</span> монет</div>
+            <div id="rank">🎖️ Ранг: Без ранга</div>
+        </div>
+        <div class="nick-input">
+            <input type="text" id="nick" placeholder="Ник" maxlength="16">
+            <button class="load-btn" onclick="loadData()">Загрузить</button>
+        </div>
+    </div>
+
+    <div class="categories">
+        <button class="cat-btn active" onclick="showTab('ranks')">🎖️ Ранги</button>
+        <button class="cat-btn" onclick="showTab('keys')">🔑 Ключи</button>
+        <button class="cat-btn" onclick="showTab('kits')">🎒 Киты</button>
+    </div>
+
+    <!-- Ранги -->
+    <div id="ranks" class="products">
+        <div class="card"><div>💎</div><h3>HELPER</h3><div class="price">10 ₽ <span class="stars">(13⭐)</span></div><ul class="features"><li><i>✓</i> /fly 15мин/день</li><li><i>✓</i> 500 монет/день</li></ul><button class="buy-btn" onclick="buy('rank','helper',10,13)">Купить за 13⭐</button></div>
+        <div class="card"><div>👑</div><h3>VIP</h3><div class="price">50 ₽ <span class="stars">(65⭐)</span></div><ul class="features"><li><i>✓</i> /fly 30мин/день</li><li><i>✓</i> 1500 монет/день</li><li><i>✓</i> Сила I</li></ul><button class="buy-btn" onclick="buy('rank','vip',50,65)">Купить за 65⭐</button></div>
+        <div class="card"><div>⭐</div><h3>MVP</h3><div class="price">100 ₽ <span class="stars">(130⭐)</span></div><ul class="features"><li><i>✓</i> /fly 1час/день</li><li><i>✓</i> 3000 монет/день</li><li><i>✓</i> Сила II</li></ul><button class="buy-btn" onclick="buy('rank','mvp',100,130)">Купить за 130⭐</button></div>
+        <div class="card"><div>🏆</div><h3>LEGEND</h3><div class="price">250 ₽ <span class="stars">(325⭐)</span></div><ul class="features"><li><i>✓</i> /fly 2часа/день</li><li><i>✓</i> 5000 монет/день</li><li><i>✓</i> 2 дома</li></ul><button class="buy-btn" onclick="buy('rank','legend',250,325)">Купить за 325⭐</button></div>
+        <div class="card"><div>⚡</div><h3>GOD</h3><div class="price">500 ₽ <span class="stars">(650⭐)</span></div><ul class="features"><li><i>✓</i> /fly безлимит</li><li><i>✓</i> 10000 монет/день</li><li><i>✓</i> Все киты</li></ul><button class="buy-btn" onclick="buy('rank','god',500,650)">Купить за 650⭐</button></div>
+    </div>
+
+    <!-- Ключи -->
+    <div id="keys" class="products hidden">
+        <div class="card"><div>🎁</div><h3>1 КЛЮЧ</h3><div class="price">10 ₽ <span class="stars">(13⭐)</span></div><ul class="features"><li><i>✓</i> Обычный кейс</li><li><i>✓</i> Монеты 50-5000</li></ul><button class="buy-btn" onclick="buy('key','key_1',10,13,1)">Купить за 13⭐</button></div>
+        <div class="card"><div>🎁🎁</div><h3>5 КЛЮЧЕЙ</h3><div class="price">45 ₽ <span class="stars">(59⭐)</span></div><ul class="features"><li><i>✓</i> 5 кейсов</li><li><i>✓</i> Редкий лут</li></ul><button class="buy-btn" onclick="buy('key','key_5',45,59,5)">Купить за 59⭐</button></div>
+        <div class="card"><div>🎁🎁🎁</div><h3>10 КЛЮЧЕЙ</h3><div class="price">80 ₽ <span class="stars">(104⭐)</span></div><ul class="features"><li><i>✓</i> 10 кейсов</li><li><i>✓</i> Легендарный лут</li></ul><button class="buy-btn" onclick="buy('key','key_10',80,104,10)">Купить за 104⭐</button></div>
+        <div class="card"><div>✨</div><h3>ЛЕГЕНДАРНЫЙ КЛЮЧ</h3><div class="price">100 ₽ <span class="stars">(130⭐)</span></div><ul class="features"><li><i>✓</i> Легендарный кейс</li><li><i>✓</i> Незеритовый меч</li></ul><button class="buy-btn" onclick="buy('key','legendary_key',100,130,1)">Купить за 130⭐</button></div>
+        <div c
+
+
+lass="card"><div>💎</div><h3>VIP КЛЮЧ</h3><div class="price">250 ₽ <span class="stars">(325⭐)</span></div><ul class="features"><li><i>✓</i> VIP-кейс</li><li><i>✓</i> Незеритовая броня</li></ul><button class="buy-btn" onclick="buy('key','vip_key',250,325,1)">Купить за 325⭐</button></div>
+    </div>
+
+    <!-- Киты -->
+    <div id="kits" class="products hidden">
+        <div class="card"><div>🗡️</div><h3>КИТ ВОИН</h3><div class="price">30 ₽ <span class="stars">(39⭐)</span></div><ul class="features"><li><i>✓</i> Алмазный меч</li><li><i>✓</i> Щит + броня</li><li><i>✓</i> 3 золотых яблока</li></ul><button class="buy-btn" onclick="buy('kit','warrior',30,39)">Купить за 39⭐</button></div>
+        <div class="card"><div>🏹</div><h3>КИТ ЛУЧНИК</h3><div class="price">30 ₽ <span class="stars">(39⭐)</span></div><ul class="features"><li><i>✓</i> Лук сила III</li><li><i>✓</i> 34 спектральных</li><li><i>✓</i> 42 стрелы исцеления</li></ul><button class="buy-btn" onclick="buy('kit','archer',30,39)">Купить за 39⭐</button></div>
+        <div class="card"><div>🧪</div><h3>КИТ ЗЕЛЬЕВАР</h3><div class="price">50 ₽ <span class="stars">(65⭐)</span></div><ul class="features"><li><i>✓</i> Зелья + ингредиенты</li><li><i>✓</i> 20 огненного порошка</li></ul><button class="buy-btn" onclick="buy('kit','alchemist',50,65)">Купить за 65⭐</button></div>
+        <div class="card"><div>👑</div><h3>ЛЕГЕНДАРНЫЙ КИТ</h3><div class="price">200 ₽ <span class="stars">(260⭐)</span></div><ul class="features"><li><i>✓</i> Незеритовый меч</li><li><i>✓</i> Незеритовая броня</li><li><i>✓</i> Тотем</li></ul><button class="buy-btn" onclick="buy('kit','legendary',200,260)">Купить за 260⭐</button></div>
+    </div>
+
+    <footer>⚔️ Mafia Economy | Поддержка: <span style="color:#ffd700">@mafia_support</span> | Оплата Telegram Stars ⭐</footer>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>⭐ Оплата Telegram Stars</h2>
+        <div id="payInfo"></div>
+        <button class="telegram-btn" onclick="payNow()">📱 Оплатить через Telegram</button>
+        <p style="font-size:12px;margin-top:10px;color:#888">После оплаты товар выдаст бот</p>
+    </div>
+</div>
+
+<div id="notify" class="notification"></div>
+
+<script>
+let currentBuy = null;
+let purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
+const BOT = "mafia_donate_bot"; // Замени на username своего бота
+
+function copyIP(){navigator.clipboard.writeText(document.getElementById('server-ip').innerText);showMsg('✅ IP скопирован')}
+function showMsg(t,s='success'){let n=document.getElementById('notify');n.textContent=t;n.style.background=s==='success'?'#4caf50':'#f44336';n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3000)}
+function showTab(tab){document.querySelectorAll('.products').forEach(el=>el.classList.add('hidden'));document.getElementById(tab).classList.remove('hidden');document.querySelectorAll('.cat-btn').forEach(btn=>btn.classList.remove('active'));event.target.classList.add('active')}
+function loadData(){let nick=document.getElementById('nick').value.trim();if(!nick)return showMsg('❌ Введи ник','error');localStorage.setItem('last_nick',nick);document.getElementById('coins').innerText=Math.floor(Math.random()*10000);showMsg(`✅ Данные ${nick} загружены`)}
+function buy(type,code,rub,stars,amt=1){let nick=document.getElementById('nick').value.trim();if(!nick)return showMsg('❌ Введи ник','error');let names={helper:'HELPER',vip:'VIP',mvp:'MVP',legend:'LEGEND',god:'GOD',key_1:'1 ключ',key_5:'5 ключей',key_10:'10 ключей',legendary_key:'Легендарный ключ',vip_key:'VIP ключ',warrior:'Кит ВОИН',archer:'Кит ЛУЧНИК',alchemist:'Кит ЗЕЛЬЕВАР',legendary:'Легендарный кит'};currentBuy={type,code,name:names[code]||code,rub,stars,nick,amt,id:'p_'+Date.now()+'_'+Math.random().toString(36).substr(2,6)};document.getElementById('payInfo').innerHTML=`<div style="text-align:left"><p>🎁 ${currentBuy.name}</p><p>⭐ ${stars} Stars</
+Date.now - Domain for Sale | Buy Now on NextBrand.com | NextBrand
+Date.now - Domain for Sale | Buy Now on NextBrand.com | NextBrand
+www.nextbrand.com
+
+
+p><p>💰 ${rub} ₽</p><p>👤 ${nick}</p></div>`;document.getElementById('modal').style.display='flex'}
+function closeModal(){document.getElementById('modal').style.display='none';currentBuy=null}
+function payNow(){if(!currentBuy)return;purchases.push({...currentBuy,date:new Date().toISOString()});localStorage.setItem('purchases',JSON.stringify(purchases));window.open(`https://t.me/${BOT}?start=${currentBuy.id}`,'_blank');showMsg('✅ Перейди в Telegram для оплаты');closeModal()}
+document.getElementById('nick').value=localStorage.getItem('last_nick')||'';setInterval(()=>{document.getElementById('online').innerText=Math.floor(Math.random()*50)+10},30000);if(document.getElementById('nick').value)loadData();
+</script>
+</body>
+</html>
